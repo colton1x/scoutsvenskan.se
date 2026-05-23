@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scout Svenskan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+:root {
+  --green: #0a2e1a;
+  --green-mid: #1a5c35;
+  --green-accent: #22c55e;
+  --red: #dc2626;
+  --ink: #0f0f0f;
+  --ink-2: #374151;
+  --ink-3: #6b7280;
+  --ink-4: #9ca3af;
+  --bg: #f9f9f7;
+  --bg2: #f3f3f0;
+  --white: #ffffff;
+  --border: #e5e5e1;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+button { font-family: 'Inter', sans-serif; cursor: pointer; }
+img { display: block; }
+a { text-decoration: none; color: inherit; }
+
+/* TOPBAR */
+.topbar { background: var(--green); padding: 0 1.5rem; }
+.topbar-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 44px; }
+.topbar-left { display: flex; align-items: center; gap: 1rem; }
+.top-date { font-size: 0.7rem; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; }
+.top-divider { width: 1px; height: 16px; background: rgba(255,255,255,0.15); }
+.top-category-links { display: flex; gap: 1.2rem; }
+.top-category-links span { font-size: 0.7rem; color: rgba(255,255,255,0.55); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: color 0.15s; }
+.top-category-links span:hover { color: var(--green-accent); }
+.topbar-right { display: flex; align-items: center; gap: 0.8rem; }
+.admin-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); padding: 4px 12px; border-radius: 2px; font-size: 0.7rem; letter-spacing: 0.06em; transition: all 0.2s; }
+.admin-btn:hover { border-color: var(--green-accent); color: var(--green-accent); }
+.admin-btn.active { border-color: var(--green-accent); color: var(--green-accent); background: rgba(34,197,94,0.08); }
+
+/* MASTHEAD */
+.masthead { background: var(--green); border-bottom: 3px solid var(--green-accent); padding: 1.4rem 1.5rem 1.8rem; text-align: center; }
+.site-name { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 900; color: #fff; letter-spacing: -0.03em; line-height: 1; }
+.site-name span { color: var(--green-accent); }
+
+/* SECTION LABEL */
+.section-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--green-mid); border-left: 3px solid var(--green-accent); padding-left: 8px; margin-bottom: 1.2rem; }
+
+/* LAYOUT */
+.site-wrap { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+/* HERO */
+.hero { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; margin-bottom: 2.5rem; border-bottom: 1px solid var(--border); padding-bottom: 2.5rem; }
+.hero-main { cursor: pointer; }
+.hero-img-wrap { position: relative; overflow: hidden; border-radius: 3px; margin-bottom: 1rem; aspect-ratio: 16/9; background: var(--bg2); }
+.hero-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+.hero-main:hover .hero-img-wrap img { transform: scale(1.02); }
+.hero-tag { display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; background: var(--red); color: #fff; padding: 3px 8px; border-radius: 1px; margin-bottom: 0.7rem; }
+.hero-title { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 0.8rem; }
+.hero-main:hover .hero-title { color: var(--green-mid); }
+.hero-excerpt { font-size: 0.95rem; color: var(--ink-2); line-height: 1.65; margin-bottom: 0.8rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.hero-meta { font-size: 0.75rem; color: var(--ink-4); display: flex; align-items: center; gap: 0.5rem; }
+.hero-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-4); }
+
+/* SIDEBAR */
+.hero-sidebar { display: flex; flex-direction: column; gap: 0; border-left: 1px solid var(--border); padding-left: 1.5rem; }
+.side-card { cursor: pointer; padding: 1rem 0; border-bottom: 1px solid var(--border); display: flex; gap: 0.8rem; align-items: flex-start; }
+.side-card:first-child { padding-top: 0; }
+.side-card:last-child { border-bottom: none; padding-bottom: 0; }
+.side-card-img { width: 80px; height: 56px; border-radius: 2px; object-fit: cover; flex-shrink: 0; background: var(--bg2); }
+.side-tag { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green-mid); margin-bottom: 0.3rem; }
+.side-title { font-size: 0.83rem; font-weight: 600; line-height: 1.35; color: var(--ink); }
+.side-card:hover .side-title { color: var(--green-mid); }
+.side-date { font-size: 0.7rem; color: var(--ink-4); margin-top: 4px; }
+
+/* ARTICLE GRID */
+.grid-section { margin-bottom: 2.5rem; }
+.article-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.article-card { cursor: pointer; }
+.card-img-wrap { overflow: hidden; border-radius: 3px; aspect-ratio: 16/9; background: var(--bg2); margin-bottom: 0.8rem; }
+.card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.35s ease; }
+.article-card:hover .card-img-wrap img { transform: scale(1.04); }
+.card-tag { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--red); margin-bottom: 0.4rem; }
+.card-title { font-size: 1rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; margin-bottom: 0.4rem; color: var(--ink); }
+.article-card:hover .card-title { color: var(--green-mid); }
+.card-excerpt { font-size: 0.8rem; color: var(--ink-3); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0.5rem; }
+.card-meta { font-size: 0.72rem; color: var(--ink-4); }
+
+/* EMPTY */
+.empty { text-align: center; padding: 5rem 2rem; }
+.empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+.empty h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.4rem; }
+.empty p { font-size: 0.85rem; color: var(--ink-3); }
+
+/* ARTICLE READ */
+.read-wrap { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+.back-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); background: none; border: none; padding: 6px 0; margin-bottom: 2rem; transition: color 0.15s; }
+.back-btn:hover { color: var(--green-mid); }
+.read-layout { display: grid; grid-template-columns: 1fr 300px; gap: 3rem; }
+.read-cat { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--red); margin-bottom: 0.6rem; }
+.read-title { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 800; letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 1rem; }
+.read-byline { font-size: 0.8rem; color: var(--ink-3); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 0.7rem 0; margin-bottom: 1.8rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+
+/* ARTICLE BODY — rendered rich text */
+.read-body { font-size: 1.05rem; line-height: 1.85; color: var(--ink-2); }
+.read-body p { margin-bottom: 1.1em; }
+.read-body h1, .read-body h2 { font-weight: 700; letter-spacing: -0.02em; color: var(--ink); margin: 1.6em 0 0.5em; }
+.read-body h1 { font-size: 1.6rem; }
+.read-body h2 { font-size: 1.25rem; }
+.read-body strong { font-weight: 700; color: var(--ink); }
+.read-body em { font-style: italic; }
+.read-body ul, .read-body ol { padding-left: 1.5rem; margin-bottom: 1.1em; }
+.read-body li { margin-bottom: 0.3em; }
+.read-body blockquote { border-left: 4px solid var(--green-accent); margin: 1.5em 0; padding: 0.6em 1.2em; background: var(--bg2); font-style: italic; color: var(--ink-2); border-radius: 0 3px 3px 0; }
+.read-body img { max-width: 100%; border-radius: 4px; margin: 1.5em auto; display: block; cursor: zoom-in; }
+.read-body a { color: var(--green-mid); text-decoration: underline; }
+
+/* READ SIDEBAR */
+.read-sidebar { border-left: 1px solid var(--border); padding-left: 2rem; }
+.related-card { cursor: pointer; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+.related-card:last-child { border-bottom: none; }
+.related-card img { width: 100%; border-radius: 2px; object-fit: cover; aspect-ratio: 16/9; background: var(--bg2); margin-bottom: 0.6rem; }
+.related-tag { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 0.3rem; }
+.related-title { font-size: 0.85rem; font-weight: 600; line-height: 1.35; color: var(--ink); }
+.related-card:hover .related-title { color: var(--green-mid); }
+.related-date { font-size: 0.7rem; color: var(--ink-4); margin-top: 4px; }
+
+/* ADMIN BAR */
+.admin-bar { background: #0a1a10; border-bottom: 2px solid var(--green-accent); padding: 0.7rem 1.5rem; }
+.admin-bar-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; }
+.admin-bar span { font-size: 0.72rem; color: var(--green-accent); font-weight: 600; letter-spacing: 0.08em; }
+.admin-bar-btn { background: var(--green-accent); color: var(--green); border: none; padding: 5px 14px; border-radius: 2px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; transition: opacity 0.2s; }
+.admin-bar-btn:hover { opacity: 0.85; }
+.admin-bar-btn.ghost { background: none; border: 1px solid rgba(34,197,94,0.3); color: var(--green-accent); }
+.admin-bar-btn.ghost:hover { background: rgba(34,197,94,0.08); }
+
+/* WRITE PANEL */
+.write-panel { background: var(--white); border: 1px solid var(--border); border-radius: 4px; padding: 2rem; margin-bottom: 2rem; }
+.write-panel h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--ink); border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
+.field { margin-bottom: 1.2rem; }
+.field label { display: block; font-size: 0.67rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.45rem; }
+.field input, .field select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 2px; padding: 0.65rem 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; transition: border-color 0.15s; }
+.field input:focus, .field select:focus { border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(26,92,53,0.1); }
+.write-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+/* QUILL EDITOR */
+.editor-wrap { border: 1px solid var(--border); border-radius: 3px; background: var(--white); }
+.ql-toolbar.ql-snow { border: none; border-bottom: 1px solid var(--border); border-radius: 3px 3px 0 0; background: var(--bg); font-family: 'Inter', sans-serif; padding: 8px 12px; }
+.ql-container.ql-snow { border: none; font-family: 'Inter', sans-serif; font-size: 1rem; }
+.ql-editor { min-height: 380px; padding: 1.2rem 1.4rem; line-height: 1.8; color: var(--ink); }
+.ql-editor p { margin-bottom: 0.8em; }
+.ql-editor img { max-width: 100%; border-radius: 4px; margin: 0.8em 0; cursor: pointer; }
+.ql-editor img.selected { outline: 3px solid var(--green-accent); }
+.ql-editor blockquote { border-left: 4px solid var(--green-accent); padding-left: 1em; color: var(--ink-3); font-style: italic; }
+.ql-editor h1 { font-size: 1.6rem; font-weight: 700; }
+.ql-editor h2 { font-size: 1.25rem; font-weight: 700; }
+.ql-snow .ql-picker { font-family: 'Inter', sans-serif; }
+.ql-snow .ql-stroke { stroke: var(--ink-3); }
+.ql-snow .ql-fill { fill: var(--ink-3); }
+.ql-snow.ql-toolbar button:hover .ql-stroke { stroke: var(--green-mid); }
+.ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: var(--green-mid); }
+
+/* image resize handles */
+.img-resize-wrap { display: inline-block; position: relative; }
+
+.write-actions { display: flex; align-items: center; gap: 0.8rem; padding-top: 1rem; border-top: 1px solid var(--border); margin-top: 1rem; }
+.publish-btn { background: var(--green); color: #fff; border: none; padding: 0.65rem 1.6rem; border-radius: 2px; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.03em; transition: background 0.2s; }
+.publish-btn:hover { background: var(--green-mid); }
+.cancel-btn { background: none; border: 1px solid var(--border); color: var(--ink-3); padding: 0.65rem 1.2rem; border-radius: 2px; font-size: 0.85rem; transition: all 0.2s; }
+.cancel-btn:hover { border-color: var(--ink-3); color: var(--ink); }
+.toast { display: none; font-size: 0.8rem; color: var(--green-mid); font-weight: 500; margin-left: auto; }
+.toast.show { display: block; }
+
+/* PASSWORD MODAL */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 999; }
+.overlay.hidden { display: none; }
+.modal { background: var(--white); border-radius: 4px; padding: 2rem; width: 100%; max-width: 340px; }
+.modal h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+.modal p { font-size: 0.8rem; color: var(--ink-3); margin-bottom: 1.2rem; }
+.modal input { width: 100%; border: 1px solid var(--border); background: var(--bg); border-radius: 2px; padding: 0.6rem 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; margin-bottom: 0.6rem; }
+.modal input:focus { border-color: var(--green-mid); }
+.modal-err { font-size: 0.75rem; color: var(--red); min-height: 1rem; margin-bottom: 0.6rem; }
+.modal-btns { display: flex; gap: 0.6rem; }
+
+/* LIGHTBOX */
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; z-index: 9999; cursor: zoom-out; }
+.lightbox.hidden { display: none; }
+.lightbox img { max-width: 92vw; max-height: 92vh; object-fit: contain; border-radius: 2px; }
+
+/* TICKER */
+.ticker-wrap { background: var(--ink); border-bottom: 1px solid #222; overflow: hidden; height: 32px; display: flex; align-items: center; }
+.ticker-label { background: var(--red); color: #fff; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0 12px; height: 100%; display: flex; align-items: center; flex-shrink: 0; }
+.ticker-track { display: flex; align-items: center; overflow: hidden; flex: 1; }
+.ticker-inner { display: flex; gap: 2.5rem; white-space: nowrap; font-size: 0.72rem; color: rgba(255,255,255,0.65); animation: ticker 30s linear infinite; padding-left: 2rem; }
+.ticker-inner span { cursor: pointer; }
+.ticker-inner span:hover { color: var(--green-accent); }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* LOADING */
+.loading { text-align: center; padding: 4rem; color: var(--ink-4); font-size: 0.9rem; }
+
+/* FOOTER */
+footer { background: var(--green); color: rgba(255,255,255,0.4); text-align: center; padding: 2rem; font-size: 0.75rem; margin-top: 3rem; border-top: 3px solid var(--green-accent); }
+footer strong { color: rgba(255,255,255,0.75); }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-sidebar { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 1.5rem; flex-direction: row; overflow-x: auto; gap: 0; }
+  .side-card { min-width: 200px; border-bottom: none; border-right: 1px solid var(--border); padding: 0 1rem 0 0; }
+  .article-grid { grid-template-columns: 1fr 1fr; }
+  .read-layout { grid-template-columns: 1fr; }
+  .read-sidebar { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 1.5rem; }
+}
+@media (max-width: 600px) {
+  .article-grid { grid-template-columns: 1fr; }
+  .write-row { grid-template-columns: 1fr; }
+  .top-category-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD MODAL -->
+<div class="overlay hidden" id="pw-overlay">
+  <div class="modal">
+    <h3>🔒 Admin login</h3>
+    <p>Enter your password to access the editor.</p>
+    <input type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="modal-err" id="pw-err"></div>
+    <div class="modal-btns">
+      <button class="publish-btn" onclick="checkPw()">Sign in</button>
+      <button class="cancel-btn" onclick="document.getElementById('pw-overlay').classList.add('hidden')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox hidden" id="lightbox" onclick="closeLightbox()">
+  <img id="lb-img" src="" alt="">
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-left">
+      <span class="top-date" id="top-date"></span>
+      <div class="top-divider"></div>
+      <div class="top-category-links" id="top-cats"></div>
+    </div>
+    <div class="topbar-right">
+      <button class="admin-btn" id="admin-toggle-btn" onclick="adminToggle()">Admin</button>
+    </div>
+  </div>
+</div>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="site-name">Scout<span>Svenskan</span></div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-wrap" id="ticker-wrap" style="display:none">
+  <div class="ticker-label">Latest</div>
+  <div class="ticker-track"><div class="ticker-inner" id="ticker-inner"></div></div>
+</div>
+
+<!-- ADMIN BAR -->
+<div class="admin-bar" id="admin-bar" style="display:none">
+  <div class="admin-bar-inner">
+    <span>✏️ Admin mode</span>
+    <button class="admin-bar-btn" onclick="showWritePanel()">+ New Article</button>
+    <button class="admin-bar-btn ghost" onclick="signOut()">Sign out</button>
+  </div>
+</div>
+
+<!-- WRITE PANEL -->
+<div id="write-panel-wrap" style="display:none">
+  <div class="site-wrap">
+    <div class="write-panel">
+      <h2>New Article</h2>
+      <div class="field">
+        <label>Headline</label>
+        <input type="text" id="f-title" placeholder="e.g. Inside the high press revolution…">
+      </div>
+      <div class="write-row">
+        <div class="field">
+          <label>Category</label>
+          <select id="f-cat">
+            <option value="Match Report">Match Report</option>
+            <option value="Tactics">Tactics</option>
+            <option value="Transfer Talk">Transfer Talk</option>
+            <option value="Opinion">Opinion</option>
+            <option value="History">History</option>
+            <option value="Player Focus">Player Focus</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Author</label>
+          <input type="text" id="f-author" placeholder="Your name">
+        </div>
+      </div>
+      <div class="field">
+        <label>Article — type, format, and insert images anywhere</label>
+        <div class="editor-wrap">
+          <div id="editor"></div>
+        </div>
+      </div>
+      <div class="write-actions">
+        <button class="publish-btn" onclick="publishPost()">Publish</button>
+        <button class="cancel-btn" onclick="hideWritePanel()">Cancel</button>
+        <span class="toast" id="toast">✓ Published!</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN SITE -->
+<div id="site-view">
+  <div id="view-home" class="site-wrap">
+    <div id="home-loading" class="loading">Loading articles…</div>
+    <div id="home-content" style="display:none">
+      <div class="hero" id="hero-section"></div>
+      <div class="grid-section" id="grid-section">
+        <div class="section-label">Latest Articles</div>
+        <div class="article-grid" id="article-grid"></div>
+      </div>
+    </div>
+    <div id="home-empty" class="empty" style="display:none">
+      <div class="empty-icon">⚽</div>
+      <h3>No articles yet</h3>
+      <p id="empty-hint">Sign in as admin to publish the first one.</p>
+    </div>
+  </div>
+
+  <div id="view-article" style="display:none">
+    <div class="read-wrap">
+      <button class="back-btn" onclick="showHome()">← Back to Scout Svenskan</button>
+      <div class="read-layout">
+        <div class="read-main">
+          <div class="read-cat" id="r-cat"></div>
+          <h1 class="read-title" id="r-title"></h1>
+          <div class="read-byline" id="r-byline"></div>
+          <div class="read-body" id="r-body"></div>
+        </div>
+        <div class="read-sidebar">
+          <div class="section-label">More Articles</div>
+          <div id="r-related"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><strong>Scout Svenskan</strong> — All rights reserved</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+<script>
+// ══════════════════════════════════════════════
+const JSONBIN_BIN_ID  = '6a100d0d6610dd3ae887b2b3';
+const JSONBIN_API_KEY = '$2a$10$Iau6GncmLdcqDEm7Ox/AiuvIZwk2RzMGLbJhH.SxDhw9YUHQdDGMa';
+const ADMIN_PASSWORD  = 'scout2025';
+// ══════════════════════════════════════════════
+
+const API = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+const HEADERS = { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY };
+
+let posts = [];
+let isAuthed = sessionStorage.getItem('scoutAuth') === '1';
+let quill = null;
+
+// Date
+document.getElementById('top-date').textContent =
+  new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+// ── QUILL INIT ─────────────────────────────────
+function initQuill() {
+  if (quill) return;
+  quill = new Quill('#editor', {
+    theme: 'snow',
+    placeholder: 'Write your article here. Use the toolbar to add headings, bold, quotes, bullet points, and images — drop images anywhere in the text…',
+    modules: {
+      toolbar: [
+        [{ header: [1, 2, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        ['blockquote'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link', 'image'],
+        ['clean']
+      ]
+    }
+  });
+
+  // Custom image handler — converts to base64 and inserts inline
+  quill.getModule('toolbar').addHandler('image', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+    input.onchange = () => {
+      Array.from(input.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const range = quill.getSelection(true);
+          quill.insertEmbed(range.index, 'image', e.target.result);
+          quill.setSelection(range.index + 1);
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+    input.click();
+  });
+
+  // Click image in editor to zoom
+  quill.root.addEventListener('click', e => {
+    if (e.target.tagName === 'IMG') openLightbox(e.target.src);
+  });
+}
+
+// ── FETCH POSTS ────────────────────────────────
+async function fetchPosts() {
+  try {
+    const r = await fetch(API + '/latest', { headers: HEADERS });
+    const d = await r.json();
+    posts = (d.record && d.record.posts) ? d.record.posts : [];
+    renderHome();
+  } catch(e) {
+    document.getElementById('home-loading').textContent = 'Failed to load articles.';
+  }
+}
+
+async function savePosts() {
+  await fetch(API, { method: 'PUT', headers: HEADERS, body: JSON.stringify({ posts }) });
+}
+
+// ── EXTRACT COVER IMAGE from HTML content ──────
+function extractCoverImg(html) {
+  const m = html.match(/<img[^>]+src="([^"]+)"/);
+  return m ? m[1] : null;
+}
+
+function stripHtml(html) {
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+// ── RENDER HOME ────────────────────────────────
+function renderHome() {
+  document.getElementById('home-loading').style.display = 'none';
+  if (posts.length === 0) {
+    document.getElementById('home-empty').style.display = 'block';
+    return;
+  }
+  document.getElementById('home-content').style.display = 'block';
+  document.getElementById('home-empty').style.display = 'none';
+
+  // Ticker
+  if (posts.length > 1) {
+    const doubled = [...posts, ...posts].map(p =>
+      `<span onclick="openPost(${p.id})">${p.category.toUpperCase()}: ${esc(p.title)}</span>`).join('');
+    document.getElementById('ticker-inner').innerHTML = doubled;
+    document.getElementById('ticker-wrap').style.display = 'flex';
+  }
+
+  // Top cats
+  const cats = [...new Set(posts.map(p => p.category))];
+  document.getElementById('top-cats').innerHTML = cats.map(c =>
+    `<span onclick="openPost(${posts.find(p=>p.category===c).id})">${c}</span>`).join('');
+
+  // Hero
+  const [hero, ...rest] = posts;
+  const heroThumb = extractCoverImg(hero.html || '');
+  const sideItems = rest.slice(0, 4);
+
+  document.getElementById('hero-section').innerHTML = `
+    <div class="hero-main" onclick="openPost(${hero.id})">
+      <div class="hero-img-wrap">${heroThumb
+        ? `<img src="${heroThumb}" alt="">`
+        : '<div style="width:100%;height:100%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:3rem">⚽</div>'}</div>
+      <div class="hero-tag">${hero.category}</div>
+      <h2 class="hero-title">${esc(hero.title)}</h2>
+      <p class="hero-excerpt">${esc(stripHtml(hero.html||'').slice(0,200))}</p>
+      <div class="hero-meta"><span>${hero.author}</span><span class="hero-meta-dot"></span><span>${hero.date}</span><span class="hero-meta-dot"></span><span>${hero.readMin} min read</span></div>
+    </div>
+    <div class="hero-sidebar">
+      ${sideItems.map(p => {
+        const thumb = extractCoverImg(p.html || '');
+        return `<div class="side-card" onclick="openPost(${p.id})">
+          ${thumb ? `<img class="side-card-img" src="${thumb}" alt="">` : ''}
+          <div><div class="side-tag">${p.category}</div><div class="side-title">${esc(p.title)}</div><div class="side-date">${p.date}</div></div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  // Grid
+  const gridPosts = posts.slice(5);
+  document.getElementById('grid-section').style.display = gridPosts.length ? 'block' : 'none';
+  document.getElementById('article-grid').innerHTML = gridPosts.map(p => {
+    const thumb = extractCoverImg(p.html || '');
+    return `<div class="article-card" onclick="openPost(${p.id})">
+      <div class="card-img-wrap">${thumb
+        ? `<img src="${thumb}" alt="">`
+        : '<div style="width:100%;height:100%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:2rem">⚽</div>'}</div>
+      <div class="card-tag">${p.category}</div>
+      <div class="card-title">${esc(p.title)}</div>
+      <div class="card-excerpt">${esc(stripHtml(p.html||'').slice(0,120))}</div>
+      <div class="card-meta">${p.author} · ${p.date}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── OPEN POST ──────────────────────────────────
+function openPost(id) {
+  const p = posts.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('view-home').style.display = 'none';
+  document.getElementById('view-article').style.display = 'block';
+  document.getElementById('r-cat').textContent = p.category;
+  document.getElementById('r-title').textContent = p.title;
+  document.getElementById('r-byline').innerHTML = `
+    <span>${p.author}</span>
+    <span style="color:var(--border)">·</span>
+    <span>${p.date}</span>
+    <span style="color:var(--border)">·</span>
+    <span>${p.readMin} min read</span>
+    ${isAuthed ? `<button onclick="deletePost(${id})" style="margin-left:auto;background:none;border:1px solid #fca5a5;color:#dc2626;padding:3px 10px;border-radius:2px;font-size:0.72rem;cursor:pointer;">Delete</button>` : ''}`;
+  document.getElementById('r-body').innerHTML = p.html || '';
+
+  // Make images in article zoomable
+  document.querySelectorAll('.read-body img').forEach(img => {
+    img.style.cursor = 'zoom-in';
+    img.onclick = () => openLightbox(img.src);
+  });
+
+  // Related
+  const related = posts.filter(x => x.id !== id).slice(0, 4);
+  document.getElementById('r-related').innerHTML = related.map(r => {
+    const thumb = extractCoverImg(r.html || '');
+    return `<div class="related-card" onclick="openPost(${r.id})">
+      ${thumb ? `<img src="${thumb}" alt="">` : ''}
+      <div class="related-tag">${r.category}</div>
+      <div class="related-title">${esc(r.title)}</div>
+      <div class="related-date">${r.date}</div>
+    </div>`;
+  }).join('');
+
+  window.scrollTo(0, 0);
+}
+
+function showHome() {
+  document.getElementById('view-home').style.display = 'block';
+  document.getElementById('view-article').style.display = 'none';
+}
+
+// ── PUBLISH ────────────────────────────────────
+async function publishPost() {
+  const title = document.getElementById('f-title').value.trim();
+  const html = quill ? quill.root.innerHTML.trim() : '';
+  const category = document.getElementById('f-cat').value;
+  const author = document.getElementById('f-author').value.trim() || 'Scout Svenskan';
+  if (!title || !html || html === '<p><br></p>') { alert('Add a headline and write some content first.'); return; }
+  const words = stripHtml(html).split(/\s+/).length;
+  const post = {
+    id: Date.now(), title, html, category, author,
+    date: new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }),
+    readMin: Math.max(1, Math.ceil(words / 200))
+  };
+  posts.unshift(post);
+  await savePosts();
+  const t = document.getElementById('toast'); t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+  clearForm();
+  hideWritePanel();
+  renderHome();
+}
+
+async function deletePost(id) {
+  if (!confirm('Delete this article?')) return;
+  posts = posts.filter(p => p.id !== id);
+  await savePosts();
+  showHome();
+  renderHome();
+}
+
+// ── LIGHTBOX ───────────────────────────────────
+function openLightbox(src) { document.getElementById('lb-img').src = src; document.getElementById('lightbox').classList.remove('hidden'); }
+function closeLightbox() { document.getElementById('lightbox').classList.add('hidden'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+// ── ADMIN / AUTH ───────────────────────────────
+function adminToggle() {
+  if (isAuthed) { signOut(); return; }
+  document.getElementById('pw-overlay').classList.remove('hidden');
+  document.getElementById('pw-err').textContent = '';
+  document.getElementById('pw-input').value = '';
+  setTimeout(() => document.getElementById('pw-input').focus(), 50);
+}
+function checkPw() {
+  if (document.getElementById('pw-input').value === ADMIN_PASSWORD) {
+    isAuthed = true;
+    sessionStorage.setItem('scoutAuth', '1');
+    document.getElementById('pw-overlay').classList.add('hidden');
+    document.getElementById('admin-bar').style.display = 'block';
+    document.getElementById('admin-toggle-btn').classList.add('active');
+    document.getElementById('admin-toggle-btn').textContent = 'Admin ✓';
+    renderHome();
+  } else {
+    document.getElementById('pw-err').textContent = 'Wrong password.';
+    document.getElementById('pw-input').select();
+  }
+}
+function signOut() {
+  isAuthed = false;
+  sessionStorage.removeItem('scoutAuth');
+  document.getElementById('admin-bar').style.display = 'none';
+  document.getElementById('admin-toggle-btn').classList.remove('active');
+  document.getElementById('admin-toggle-btn').textContent = 'Admin';
+  hideWritePanel();
+  renderHome();
+}
+function showWritePanel() {
+  initQuill();
+  document.getElementById('write-panel-wrap').style.display = 'block';
+  window.scrollTo(0, 200);
+}
+function hideWritePanel() { document.getElementById('write-panel-wrap').style.display = 'none'; clearForm(); }
+function clearForm() {
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-author').value = '';
+  document.getElementById('f-cat').selectedIndex = 0;
+  if (quill) quill.setText('');
+}
+
+if (isAuthed) {
+  document.getElementById('admin-bar').style.display = 'block';
+  document.getElementById('admin-toggle-btn').classList.add('active');
+  document.getElementById('admin-toggle-btn').textContent = 'Admin ✓';
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+fetchPosts();
+</script>
+</body>
+</html>
